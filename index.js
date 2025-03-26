@@ -4,9 +4,12 @@ const mongoose = require('mongoose');
 const cors = require('cors');
 const dotenv = require('dotenv');
 
-const User = require('./models/users');
+const User = require("./models/users");  
 const Cars = require('./models/cars');
 const Location = require('./models/location');
+
+const authcontroller = require('./controllers/authcontroller');
+const authJwt = require("./Middleware/authJwt.js");
 
 dotenv.config();
 
@@ -16,6 +19,7 @@ app.use(express.json());
 mongoose.connect(process.env.MONGO_URL)
     .then(() => console.log('Connexion à MongoDB réussie !'))
     .catch((err) => console.log('Connexion à MongoDB échouée : ', err));
+
 
 
 // Routes
@@ -98,6 +102,10 @@ app.delete("/deleteUser", async (req, res) => {
         res.status(500).send("Erreur lors de la suppression de l'utilisateur :" + err)
     }
 })
+
+app.post("/api/auth/signup", authcontroller.signup);
+app.post("/api/auth/signin", authcontroller.signin);
+app.post("/api/auth/signout",authcontroller.signout);
 
 app.listen(process.env.PORT, () => {
     console.log(`Serveur en écoute sur le port http://localhost:${process.env.PORT}`);
