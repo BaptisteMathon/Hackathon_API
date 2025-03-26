@@ -6,9 +6,8 @@ const userSchema = mongoose.Schema({
     password: {type: String, required: true},
     profilPic: {type: String, default: ''},
     isAdmin: {type: Boolean, default: false},
-    idLocCars : {type: Array, default: []},
     bio: {type: String, max: 1024},
     notes: {type: Array, default: []},
-});
+}, {collection: 'Users'});
 
 module.exports = mongoose.model('User', userSchema);

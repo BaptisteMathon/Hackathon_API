@@ -5,7 +5,7 @@ const carSchema = mongoose.Schema({
     description: {type: String, required: true},
     price: {type: Number, required: true},
     nameCar: {type: String, required: true},
-    idOwner: {type: String, required: true},
+    IdOwner: {type: String, required: true},
     mark: {type: String, required: true},
     model: {type: String, required: true},
     fuel: {type: String, required: true},
@@ -14,6 +14,6 @@ const carSchema = mongoose.Schema({
     universe: {type: String, required: true},
     franchise: {type: String, required: true},
     city: {type: String, required: true},
-});
+}, {collection: 'Cars'});
 
-module.exports = mongoose.model('Car', carSchema);
+module.exports = mongoose.model('Cars', carSchema);
