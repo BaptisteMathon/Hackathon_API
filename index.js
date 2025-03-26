@@ -8,6 +8,8 @@ const User = require("./models/users");
 const Cars = require('./models/cars');
 const Location = require('./models/location');
 
+const rateLimitMiddleware = require('./Middleware/limiter.js');
+
 const authcontroller = require('./controllers/authcontroller');
 const authJwt = require("./Middleware/authJwt.js");
 
@@ -24,7 +26,9 @@ mongoose.connect(process.env.MONGO_URL)
 
 // Routes
 
-app.get('/allCars', async (req, res) => {
+//Get
+
+app.get('/allCars', [authJwt.verifyToken,authJwt.isExist, rateLimitMiddleware], async (req, res) => {
     try {
         const allCars = await Cars.find();
         res.status(200).json(allCars);
@@ -71,7 +75,51 @@ app.get('/allLocations', async (req, res) => {
     }
 })
 
-app.delete('/deleteCars', async (req, res) => {
+//Post
+
+app.post('/createCars', [authJwt.verifyToken,authJwt.isExist, rateLimitMiddleware], async (req, res) => {
+    try {
+        const newCars = new Cars({
+            photo: req.body.photo,
+            description: req.body.description,
+            price: req.body.price,
+            nameCar: req.body.nameCar,
+            IdOwner: req.body.IdOwner,
+            mark: req.body.mark,
+            model: req.body.model,
+            fuel: req.body.fuel,
+            gearBox: req.body.gearBox,
+            doorsNumber: req.body.doorsNumber,
+            universe: req.body.universe,
+            franchise: req.body.franchise,
+            city: req.body.city,
+        });
+        const savedCars = await newCars.save();
+        res.status(201).json(savedCars);
+    } catch (err) {
+        console.error(err);
+        res.status(500).send("Erreur lors de la création de la voiture : " + err);
+    }
+  });
+
+  app.post('/createLocation', [authJwt.verifyToken,authJwt.isExist, rateLimitMiddleware], async (req, res) => {
+    try {
+        const newLocation = new Location({
+            idCarLoc: req.body.idCarLoc,
+            dateLoc: req.body.dateLoc,
+            idUser: req.body.idUser,
+        });
+        const savedLocation = await newLocation.save();
+        res.status(201).json(savedLocation);
+    } catch (err) {
+        console.error(err);
+        res.status(500).send("Erreur lors de la création de la location : " + err);
+    }
+  });
+
+//Delete
+
+app.delete('/deleteCars', [authJwt.verifyToken,authJwt.isExist, rateLimitMiddleware], async (req, res) => {
     try {
         const {idUser, idCars} = req.body;
 
@@ -104,7 +152,7 @@ app.delete('/deleteCars', async (req, res) => {
       }
 })
 
-app.delete("/deleteLocation", async (req, res) => {
+app.delete("/deleteLocation", [authJwt.verifyToken,authJwt.isExist, rateLimitMiddleware], async (req, res) => {
     try{
         const {idCarLoc, dateLoc, idUser} = req.body;
 
@@ -124,7 +172,7 @@ app.delete("/deleteLocation", async (req, res) => {
     }
 })
 
-app.delete("/deleteUser", async (req, res) => {
+app.delete("/deleteUser", [authJwt.verifyToken,authJwt.isExist, rateLimitMiddleware], async (req, res) => {
     try{
         const {idUser} = req.body;
 
@@ -143,6 +191,8 @@ app.delete("/deleteUser", async (req, res) => {
         res.status(500).send("Erreur lors de la suppression de l'utilisateur :" + err)
     }
 })
+
+//Authentification
 
 app.post("/api/auth/signup", authcontroller.signup);
 app.post("/api/auth/signin", authcontroller.signin);
