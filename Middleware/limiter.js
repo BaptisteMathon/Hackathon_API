@@ -11,4 +11,4 @@ const limiteur = rateLimit({
     legacyHeaders: false,
 });
 
-app.use(limiteur);
+module.exports = limiteur;
