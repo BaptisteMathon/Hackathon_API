@@ -33,6 +33,24 @@ app.get('/allCars', async (req, res) => {
       }
 });
 
+app.get('/allUsers', async (req, res) => {
+    try{
+        const allUsers = await User.find();
+        res.status(200).json(allUsers);
+    } catch(err){
+        res.status(500).send("Erreur lors de la récupération des utilisateurs :" + err);
+    }
+})
+
+app.get('/allLocations', async (req, res) => {
+    try{
+        const allLocations = await Location.find();
+        res.status(200).json(allLocations);
+    } catch(err){
+        res.status(500).send("Erreur lors de la récupération des locations :" + err);
+    }
+})
+
 app.delete('/deleteCars', async (req, res) => {
     try {
         const {idUser, idCars} = req.body;
@@ -42,16 +60,19 @@ app.delete('/deleteCars', async (req, res) => {
         }
 
         const carsToDelete = await Cars.findById(idCars);
-        console.log(idCars)
-        console.log(carsToDelete)
-        console.log(carsToDelete.IdOwner)
-        console.log("-----")
+        const userStatut = await User.findById(idUser);
 
-        if(carsToDelete.IdOwner !== idUser) {
+
+        if(carsToDelete.IdOwner !== idUser && !userStatut.isAdmin) {
             return res.status(403).send("Erreur lors de la suppression de la voiture : l'utilisateur n'est pas le propriétaire de la voiture");
         }
 
-        const deleteCars = await Cars.deleteMany({_id: { $in: idCars }, IdOwner: idUser});
+        let deleteCars;
+        if(userStatut.isAdmin){
+            deleteCars = await Cars.deleteOne({_id: { $in: idCars }});
+        } else {
+            deleteCars = await Cars.deleteOne({_id: { $in: idCars }, IdOwner: idUser});
+        }
 
         if (!deleteCars) {
             return res.status(500).send("Erreur lors de la suppression de la voiture : impossible de supprimer la voiture");
