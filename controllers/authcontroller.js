@@ -8,9 +8,8 @@ exports.signup = async (req, res) => {
       name: req.body.name,
       email: req.body.email,
       password: bcrypt.hashSync(req.body.password, 8),
-      profilPic: '',
       isAdmin: false,
-      bio: '',
+      bio: req.body.bio,
       notes: [],
     });
     try {
