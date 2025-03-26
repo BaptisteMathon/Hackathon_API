@@ -29,6 +29,32 @@ app.get('/allCars', async (req, res) => {
       }
 });
 
+app.put('/updateReservation/:id', async (req, res) => {
+    try {
+        const idCarLoc = req.params.id;
+        const {startDate, endDate} = req.body;
+
+        if(!idCarLoc || !startDate || !endDate){
+            return res.status(400).send("Erreur lors du changement de date : idCarLoc, startDate et endDate sont obligatoires");
+        }
+
+        const updatedDate = await Location.findOneAndUpdate(
+            { idCarLoc: idCarLoc },
+            { $set: {dateLoc: [startDate, endDate] } },
+            { new: true }
+        );
+        
+        if (!updatedDate) {
+            return res.status(404).send('Location non trouvée.');
+          }
+
+        res.status(200).json(updatedDate);
+
+    } catch (err) {
+        res.status(500).send("Erreur lors du changement de date de location : " + err);
+      }
+})
+
 app.delete('/deleteCars', async (req, res) => {
     try {
         const {idUser, idCars} = req.body;
