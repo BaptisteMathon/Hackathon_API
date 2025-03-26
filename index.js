@@ -20,6 +20,7 @@ mongoose.connect(process.env.MONGO_URL)
 
 // Routes
 
+// GET
 app.get('/allCars', async (req, res) => {
     try {
         const allCars = await Cars.find();
@@ -29,36 +30,60 @@ app.get('/allCars', async (req, res) => {
       }
 });
 
+app.get('/allLocations', async (req, res) => {
+    try {
+        const allLocation = await Location.find();
+        res.status(200).json(allLocation);
+      } catch (err) {
+        res.status(500).send("Erreur lors de la récupération des locations : " + err);
+      }
+})
+
+// POST
 app.delete('/deleteCars', async (req, res) => {
     try {
         const {idUser, idCars} = req.body;
 
         if (!idUser || !idCars) {
-            return res.status(400).send("Erreur lors de la suppression des voitures : idUser et idCars sont obligatoires");
+            return res.status(400).send("Erreur lors de la suppression de la voiture : idUser et idCars sont obligatoires");
         }
 
         const carsToDelete = await Cars.findById(idCars);
-        console.log(idCars)
-        console.log(carsToDelete)
-        console.log(carsToDelete.IdOwner)
-        console.log("-----")
 
         if(carsToDelete.IdOwner !== idUser) {
-            console.log(idUser)
-            console.log(carsToDelete.IdOwner)
-            return res.status(403).send("Erreur lors de la suppression des voitures : l'utilisateur n'est pas le propriétaire des voitures");
+            return res.status(403).send("Erreur lors de la suppression de la voiture : l'utilisateur n'est pas le propriétaire des voitures");
         }
 
-        const deleteCars = await Cars.deleteMany({_id: { $in: idCars }, IdOwner: idUser});
+        const deleteCars = await Cars.deleteOne({_id: { $in: idCars }, IdOwner: idUser});
 
         if (!deleteCars) {
-            return res.status(500).send("Erreur lors de la suppression des voitures : impossible de supprimer les voitures");
+            return res.status(500).send("Erreur lors de la suppression de la voiture : impossible de supprimer les voitures");
         }
 
         res.status(200).json(deleteCars);
       } catch (err) {
-        res.status(500).send("Erreur lors de la suppression des voitures : " + err);
+        res.status(500).send("Erreur lors de la suppression de la voiture : " + err);
       }
+})
+
+app.delete("/deleteLocation", async (req, res) => {
+    try{
+        const {idCarLoc, dateLoc, idUser} = req.body;
+
+        if(!idCarLoc || !dateLoc || !idUser){
+            return res.status(400).send("Erreur lors de la suppression de la location : idCarLoc, dateLoc et idUser sont obligatoires");
+        }
+
+        const deleteLocation = await Location.deleteOne({idCarLoc, dateLoc, idUser});
+
+        if(!deleteLocation){
+            return res.status(500).send("Erreur lors de la suppression de la location : impossible de supprimer la location");
+        }
+
+        res.status(200).json(deleteLocation);
+    } catch(err){
+        res.status(500).send("Erreur lors de la suppression de la location : " + err)
+    }
 })
 
 app.listen(process.env.PORT, () => {
