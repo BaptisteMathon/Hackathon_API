@@ -33,12 +33,32 @@ app.get('/allCars', async (req, res) => {
       }
 });
 
+app.get('/car/:id', async (req, res) => {
+    try{
+        const idCar = req.params.id;
+        const car = await Cars.findById(idCar);
+        res.status(200).json(car);
+    } catch(err) {
+        res.status(500).send("Erreur lors de la récupération de la voiture : " + err)
+    }
+})
+
 app.get('/allUsers', async (req, res) => {
     try{
         const allUsers = await User.find();
         res.status(200).json(allUsers);
     } catch(err){
         res.status(500).send("Erreur lors de la récupération des utilisateurs :" + err);
+    }
+})
+
+app.get('/user/:id', async (req, res) => {
+    try{
+        const idUser = req.params.id;
+        const user = await User.findById(idUser);
+        res.status(200).json(user);
+    } catch(err) {
+        res.status(500).send("Erreur lors de la récupération de l'utilisateur :" + err)
     }
 })
 
