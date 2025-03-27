@@ -42,7 +42,7 @@ app.get('/allCars', async (req, res) => {
       }
 });
 
-app.get('/car/:id', [authJwt.verifyToken,authJwt.isExist, rateLimitMiddleware], async (req, res) => {
+app.get('/car/:id', async (req, res) => {
     try{
         const idCar = req.params.id;
         const car = await Cars.findById(idCar);
