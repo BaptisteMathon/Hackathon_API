@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fonctionnement API Hackathon</title>
+</head>
+<body>
+    <h1>Fonctionnement de notre API pour le projet Hackathon:</h1>
+    <p>Afin d'utiliser les routes suivantes, il faut obligatoirement être connecté: </p>
+    <h2>Les GET: </h2>
+    <ul>
+        <li><span>'/allCars'</span>Renvoie toutes les voitures disponible à la location</li>
+        <li><span>'/car/:id'</span>Renvoie le détail d'une voiture, en y insérant son id</li>
+        <li><span>'/allUsers'</span>Renvoie tous les utilisateurs inscrits</li>
+        <li><span>'/user/:id'</span>Renvoie les informatons d'un utilisateur, en y insérant son id</li>
+        <li><span>'/allLocations'</span>Renvoie toutes les locations de voitures, avec l'id du véhicule, la date, et l'id de l'utilisateur</li>
+    </ul>
+    <h2>Les POST: </h2>
+    <ul>
+        <li><span>'/createCars'</span>Permet d'ajouter un nouveau véhicule à la location</li>
+        <li><span>'/createLocation'</span>Permet d'ajouter une nouvelle location, lorsqu'un utilisateur souhaite loué un véhicule</li>
+    </ul>
+    <h2>Le PUT: </h2>
+    <ul>
+        <li><span>'/updateReservation/:id'</span>Permet de modifier la date d'une location</li>
+    </ul>
+    <h2>Les DELETE: </h2>
+    <ul>
+        <li><span>'/deleteCars'</span>Permet à un utilisateur de supprimer sa voiture de la location</li>
+        <li><span>'/deleteLocation'</span>Permet à un utilisateur de supprimer une de ses locations</li>
+        <li><span>'/deleteUser'</span>Permet à l'utilisateur de supprimer son compte</li>
+    </ul>
+</body>
+</html>
+
+<style>
+    li span {
+        font-weight: bold;
+        margin-right: 15px;
+    }
+</style>

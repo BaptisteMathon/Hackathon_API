@@ -17,6 +17,7 @@ dotenv.config();
 
 app.use(cors());
 app.use(express.json());
+app.use(express.static('public'));
 
 mongoose.connect(process.env.MONGO_URL)
     .then(() => console.log('Connexion à MongoDB réussie !'))
@@ -28,6 +29,10 @@ mongoose.connect(process.env.MONGO_URL)
 
 //Get
 
+app.get('/', (req, res) => {
+    res.sendFile(__dirname + '/public/index.html');
+});
+
 app.get('/allCars', [authJwt.verifyToken,authJwt.isExist, rateLimitMiddleware], async (req, res) => {
     try {
         const allCars = await Cars.find();
@@ -37,7 +42,7 @@ app.get('/allCars', [authJwt.verifyToken,authJwt.isExist, rateLimitMiddleware], 
       }
 });
 
-app.get('/car/:id', async (req, res) => {
+app.get('/car/:id', [authJwt.verifyToken,authJwt.isExist, rateLimitMiddleware], async (req, res) => {
     try{
         const idCar = req.params.id;
         const car = await Cars.findById(idCar);
@@ -47,7 +52,7 @@ app.get('/car/:id', async (req, res) => {
     }
 })
 
-app.get('/allUsers', async (req, res) => {
+app.get('/allUsers', [authJwt.verifyToken,authJwt.isExist, rateLimitMiddleware], async (req, res) => {
     try{
         const allUsers = await User.find();
         res.status(200).json(allUsers);
@@ -56,7 +61,7 @@ app.get('/allUsers', async (req, res) => {
     }
 })
 
-app.get('/user/:id', async (req, res) => {
+app.get('/user/:id', [authJwt.verifyToken,authJwt.isExist, rateLimitMiddleware], async (req, res) => {
     try{
         const idUser = req.params.id;
         const user = await User.findById(idUser);
@@ -66,7 +71,7 @@ app.get('/user/:id', async (req, res) => {
     }
 })
 
-app.get('/allLocations', async (req, res) => {
+app.get('/allLocations', [authJwt.verifyToken,authJwt.isExist, rateLimitMiddleware], async (req, res) => {
     try{
         const allLocations = await Location.find();
         res.status(200).json(allLocations);
@@ -119,17 +124,17 @@ app.post('/createCars', [authJwt.verifyToken,authJwt.isExist, rateLimitMiddlewar
 
 //Put
 
-app.put('/updateReservation/:id', async (req, res) => {
+app.put('/updateReservation/:id', [authJwt.verifyToken,authJwt.isExist, rateLimitMiddleware], async (req, res) => {
     try {
         const idCarLoc = req.params.id;
-        const {startDate, endDate} = req.body;
+        const {startDate, endDate, idUser} = req.body;
 
-        if(!idCarLoc || !startDate || !endDate){
+        if(!idCarLoc || !startDate || !endDate || !idUser){
             return res.status(400).send("Erreur lors du changement de date : idCarLoc, startDate et endDate sont obligatoires");
         }
 
         const updatedDate = await Location.findOneAndUpdate(
-            { idCarLoc: idCarLoc },
+            { idCarLoc: idCarLoc, idUser: idUser },
             { $set: {dateLoc: [startDate, endDate] } },
             { new: true }
         );
@@ -209,6 +214,8 @@ app.delete("/deleteUser", [authJwt.verifyToken,authJwt.isExist, rateLimitMiddlew
         }
 
         const deleteUser = await User.deleteOne({_id: idUser});
+        await Location.deleteMany({idUser});
+        await Cars.deleteMany({IdOwner: idUser});
 
         if(!deleteUser){
             return res.status(500).send("Erreur lors de la suppression de l'utilisateur : impossible de supprimer l'utilisateur");
