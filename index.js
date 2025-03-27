@@ -33,7 +33,7 @@ app.get('/', (req, res) => {
     res.sendFile(__dirname + '/public/index.html');
 });
 
-app.get('/allCars', [authJwt.verifyToken,authJwt.isExist, rateLimitMiddleware], async (req, res) => {
+app.get('/allCars', async (req, res) => {
     try {
         const allCars = await Cars.find();
         res.status(200).json(allCars);
