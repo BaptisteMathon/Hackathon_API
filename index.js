@@ -7,6 +7,7 @@ const dotenv = require('dotenv');
 const User = require("./models/users");  
 const Cars = require('./models/cars');
 const Location = require('./models/location');
+const Conversation = require('./models/conversation');
 
 const rateLimitMiddleware = require('./Middleware/limiter.js');
 
@@ -80,6 +81,23 @@ app.get('/allLocations', [authJwt.verifyToken,authJwt.isExist, rateLimitMiddlewa
     }
 })
 
+app.get('/conversation/:carId', [authJwt.verifyToken,authJwt.isExist, rateLimitMiddleware], async (req, res) => {
+    try{
+        const carId = req.params.carId;
+        const user1 = req.body.User1;
+        const user2 = req.body.User2;
+        if(!user1 || !user2 || !carId){
+            return res.status(400).send("Erreur lors de la récupération de la conversation : User1, User2 et carId sont obligatoires");
+        }
+        console.log(carId)
+        console.log(user1);
+        console.log(user2);
+        const conversation = await Conversation.find({idCar: carId, User1: user1, User2: user2});
+        res.status(200).json(conversation);
+    } catch(err){
+        res.status(500).send("Erreur lors de la récupération de la conversation :" + err)
+    }
+})
 //Post
 
 app.post('/createCars', [authJwt.verifyToken,authJwt.isExist, rateLimitMiddleware], async (req, res) => {
@@ -122,6 +140,34 @@ app.post('/createCars', [authJwt.verifyToken,authJwt.isExist, rateLimitMiddlewar
     }
   });
 
+app.post('/createConversation', [authJwt.verifyToken, authJwt.isExist, rateLimitMiddleware], async (req, res) => {
+    try{
+        const { User1, User2, idCar, message } = req.body;
+
+        if(!User1 || !User2 || !idCar || !message){
+            return res.status(400).send("Erreur lors de la création de la conversation : User1, User2 et idCar sont obligatoires");
+        }
+
+        const newConversation = new Conversation({
+            User1,
+            User2,
+            idCar,
+            messages: [
+                {
+                    sender: User1,
+                    message: message,
+                    isRead: false,
+                    sentAt: new Date()
+                }
+            ]
+        });
+
+        const savedConversation = await newConversation.save();
+        res.status(201).json(savedConversation);
+    } catch(err){
+        res.status(500).send("Erreur lors de la création de la conversation : " + err);
+    }
+})
 //Put
 
 app.put('/updateReservation/:id', [authJwt.verifyToken,authJwt.isExist, rateLimitMiddleware], async (req, res) => {
@@ -148,6 +194,37 @@ app.put('/updateReservation/:id', [authJwt.verifyToken,authJwt.isExist, rateLimi
     } catch (err) {
         res.status(500).send("Erreur lors du changement de date de location : " + err);
       }
+})
+
+app.put('/updateConversation/:idCar', [authJwt.verifyToken, authJwt.isExist, rateLimitMiddleware], async (req, res) => {
+    try{
+        const idCar = req.params.idCar;
+        const { User1, message } = req.body;
+
+        if(!User1 || !idCar || !message){
+            return res.status(400).send("Erreur lors de la mise à jour de la conversation : User1, message et idCar sont obligatoires");
+        }
+
+        const user2temp = await Cars.findById(idCar);
+        const User2 = user2temp.IdOwner;
+        if(!User2){
+            return res.status(400).send("Erreur lors de la mise à jour de la conversation : échec récupération de l'utilisateur 2");
+        }
+
+        const updatedConversation = await Conversation.findOneAndUpdate(
+            { idCar: idCar, User1: User1, User2: User2 },
+            { $push: { messages: { sender: User1, message: message, isRead: false, sentAt: new Date() } } },
+            { new: true }
+        );
+
+        if (!updatedConversation) {
+            return res.status(404).send('Conversation non trouvée.');
+          }
+
+        res.status(200).json(updatedConversation);
+    } catch(err){
+        res.status(500).send("Erreur lors de la mise à jour de la conversation : " + err)
+    }
 })
 
 //Delete
@@ -224,6 +301,23 @@ app.delete("/deleteUser", [authJwt.verifyToken,authJwt.isExist, rateLimitMiddlew
         res.status(200).json(deleteUser);
     } catch(err){
         res.status(500).send("Erreur lors de la suppression de l'utilisateur :" + err)
+    }
+})
+
+app.delete("/deleteConversation", [authJwt.verifyToken, authJwt.isExist, rateLimitMiddleware], async (req, res) => {
+    try{
+        const {idConv} = req.body;
+        if(!idConv){
+            return res.status(400).send("Erreur lors de la suppression de la conversation : idConv est obligatoire");
+        }
+        const deleteConversation = await Conversation.deleteOne({_id: idConv});
+        if(!deleteConversation){
+            return res.status(500).send("Erreur lors de la suppression de la conversation : impossible de supprimer la conversation");
+        }
+        res.status(200).json(deleteConversation);
+
+    } catch(err){
+        res.status(500).send("Erreur lors de la suppression de la conversation :" + err)
     }
 })
 

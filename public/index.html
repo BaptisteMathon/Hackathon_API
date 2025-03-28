@@ -15,21 +15,25 @@
         <li><span>'/allUsers'</span>Renvoie tous les utilisateurs inscrits</li>
         <li><span>'/user/:id'</span>Renvoie les informatons d'un utilisateur, en y insérant son id</li>
         <li><span>'/allLocations'</span>Renvoie toutes les locations de voitures, avec l'id du véhicule, la date, et l'id de l'utilisateur</li>
+        <li><span>'/conversation/:carId'</span>Renvoie le détail d'une conversation </li>
     </ul>
     <h2>Les POST: </h2>
     <ul>
         <li><span>'/createCars'</span>Permet d'ajouter un nouveau véhicule à la location</li>
         <li><span>'/createLocation'</span>Permet d'ajouter une nouvelle location, lorsqu'un utilisateur souhaite loué un véhicule</li>
+        <li><span>'/createConversation'</span>Permet d'ajouter une nouvelle conversation</li>
     </ul>
     <h2>Le PUT: </h2>
     <ul>
         <li><span>'/updateReservation/:id'</span>Permet de modifier la date d'une location</li>
+        <li><span>'/updateConversation/:idCar'</span>Permet d'ajouter des messages à la conversation</li>
     </ul>
     <h2>Les DELETE: </h2>
     <ul>
         <li><span>'/deleteCars'</span>Permet à un utilisateur de supprimer sa voiture de la location</li>
         <li><span>'/deleteLocation'</span>Permet à un utilisateur de supprimer une de ses locations</li>
         <li><span>'/deleteUser'</span>Permet à l'utilisateur de supprimer son compte</li>
+        <li><span>'/deleteConversation'</span>Supprime la conversation entre 2 utilisateurs</li>
     </ul>
 </body>
 </html>
