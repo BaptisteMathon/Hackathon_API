@@ -7,33 +7,39 @@
 </head>
 <body>
     <h1>Fonctionnement de notre API pour le projet Hackathon:</h1>
-    <p>Afin d'utiliser les routes suivantes, il faut obligatoirement être connecté: </p>
+    <p>Afin d'utiliser les routes suivantes, il faut obligatoirement être connecté: (sauf pour les routes permettant l'authentification)</p>
+    <p>⚠️ ATTENTION certaines routes nécessitent de récupèrer des données via le Body de la requête</p>
     <h2>Les GET: </h2>
     <ul>
-        <li><span>'/allCars'</span>Renvoie toutes les voitures disponible à la location</li>
+        <li><span>'/allCars'</span>Renvoie toutes les voitures disponible à la location </li>
         <li><span>'/car/:id'</span>Renvoie le détail d'une voiture, en y insérant son id</li>
         <li><span>'/allUsers'</span>Renvoie tous les utilisateurs inscrits</li>
         <li><span>'/user/:id'</span>Renvoie les informatons d'un utilisateur, en y insérant son id</li>
         <li><span>'/allLocations'</span>Renvoie toutes les locations de voitures, avec l'id du véhicule, la date, et l'id de l'utilisateur</li>
-        <li><span>'/conversation/:carId'</span>Renvoie le détail d'une conversation </li>
+        <li><span>'/conversation/:carId'</span>Renvoie le détail d'une conversation <span>(User1 et User2 sont récupéré via le body de la requête)</span></li>
     </ul>
     <h2>Les POST: </h2>
     <ul>
-        <li><span>'/createCars'</span>Permet d'ajouter un nouveau véhicule à la location</li>
-        <li><span>'/createLocation'</span>Permet d'ajouter une nouvelle location, lorsqu'un utilisateur souhaite loué un véhicule</li>
-        <li><span>'/createConversation'</span>Permet d'ajouter une nouvelle conversation</li>
+        <li><span>'/createCars'</span>Permet d'ajouter un nouveau véhicule à la location <span>(Tous les élements nécessaires à la création du véhicule se à récupérer dans le body de la requête)</span> </li>
+        <li><span>'/createLocation'</span>Permet d'ajouter une nouvelle location, lorsqu'un utilisateur souhaite loué un véhicule <span>(idCarLoc, dateLoc et idUser sont à récupérer via le body de la requête)</span> </li>
+        <li><span>'/createConversation'</span>Permet d'ajouter une nouvelle conversation <span>(User1, User2, idCar et message sont à récupérer depuis le body de la requête)</span> </li>
+        <br>
+        <p>Gestion de l'authentification: </p>
+        <li><span>'/api/auth/signup'</span> Inscription</li>
+        <li><span>'/api/auth/signin'</span> Connexion</li>
+        <li><span>'/api/auth/signout'</span> Déconnexion</li>
     </ul>
     <h2>Le PUT: </h2>
     <ul>
-        <li><span>'/updateReservation/:id'</span>Permet de modifier la date d'une location</li>
-        <li><span>'/updateConversation/:idCar'</span>Permet d'ajouter des messages à la conversation</li>
+        <li><span>'/updateReservation/:id'</span>Permet de modifier la date d'une location <span>(startDate, endDate et idUser sont à récupérer depuis le body de la requête)</span> </li>
+        <li><span>'/updateConversation/:idCar'</span>Permet d'ajouter des messages à la conversation <span>(User1 et message sont à récupérer depuis le body de la requête)</span> </li>
     </ul>
     <h2>Les DELETE: </h2>
     <ul>
-        <li><span>'/deleteCars'</span>Permet à un utilisateur de supprimer sa voiture de la location</li>
-        <li><span>'/deleteLocation'</span>Permet à un utilisateur de supprimer une de ses locations</li>
-        <li><span>'/deleteUser'</span>Permet à l'utilisateur de supprimer son compte</li>
-        <li><span>'/deleteConversation'</span>Supprime la conversation entre 2 utilisateurs</li>
+        <li><span>'/deleteCars'</span>Permet à un utilisateur de supprimer sa voiture de la location <span>(idUser et idCars sont à récupérer depuis le body de la requête)</span> </li>
+        <li><span>'/deleteLocation'</span>Permet à un utilisateur de supprimer une de ses locations <span>(idCarLoc, dateLoc et idUser sont à récupérer depuis le body de la requête)</span> </li>
+        <li><span>'/deleteUser'</span>Permet à l'utilisateur de supprimer son compte <span>(idUser est à récupérer depuis le body de la requête)</span> </li>
+        <li><span>'/deleteConversation'</span>Supprime la conversation entre 2 utilisateurs <span>(idConv est à récupérer depuis le body de la requête)</span> </li>
     </ul>
 </body>
 </html>
